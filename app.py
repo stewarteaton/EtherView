@@ -1,6 +1,8 @@
 from flask import Flask, render_template
-import config
+import config, ccxt
 from web3 import Web3
+import ccxt
+
 
 app = Flask(__name__)
 
@@ -8,7 +10,11 @@ w3 = Web3(Web3.HTTPProvider(config.INFURA_URL))
 
 @app.route("/")
 def index():
-    return "<p>Ether View!</p>"
+    # connect to binance api
+    binance = ccxt.binance()
+    ether_price = binance.fetch_ticker('ETH/USDC')
+
+    return render_template('index.html', ether_price=ether_price)
 
 @app.route("/address/<addy>")
 def address(addy):
@@ -20,4 +26,5 @@ def block(blockNumber):
 
 @app.route("/tx/<hash>")
 def transaction(hash):
-    return render_template('transaction.html', hash=hash)
+    transaction = w3.eth.get_transaction(hash)
+    return render_template('transaction.html', hash=hash, transaction=transaction)

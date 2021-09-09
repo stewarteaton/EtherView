@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, flash, redirect
 import config, ccxt, time
 from web3 import Web3
 import ccxt
@@ -42,9 +42,22 @@ def index():
         current_time=current_time,
         miners = config.MINERS)
 
-@app.route("/address/<addy>")
-def address(addy):
-    return render_template('address.html', addy=addy)
+@app.route("/address")
+def address():
+    address = request.args.get('address')
+
+    ether_price = get_eth_price()
+
+    try:
+        address = w3.toChecksumAddress(address)
+    except:
+        flash('Invalid address','danger')
+        return redirect('/')
+
+    balance = w3.eth.get_balance(address)
+    balance = w3.fromWei(balance, 'ether')
+
+    return render_template('address.html', ether_price=ether_price, balance=balance, address=address)
 
 @app.route("/block/<blockNumber>")
 def block(blockNumber):

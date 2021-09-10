@@ -14,7 +14,7 @@
         </div>
         <div class="col-3">
             <h2>Gas Fee</h2>
-            {{ eth.gas_price / 1000000000 }} Gwei
+            {{ (eth.gas_price / 1000000000)|int }} Gwei
         </div>
     </div>
     <div class="row">
